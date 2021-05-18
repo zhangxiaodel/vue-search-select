@@ -44,6 +44,7 @@
       class="menu"
       ref="menu"
       @mousedown.prevent
+      @mouseleave="closeOptions"
       :class="menuClass"
       :style="menuStyle"
       tabindex="-1"
@@ -54,7 +55,8 @@
           class="item"
           :class="{ 'selected': option.selected || pointer === idx }"
           :data-vss-custom-attr="customAttr(option)"
-          @click.stop="selectItem(option)"
+          title="+shift可多选"
+          @click.stop="selectItem(option,$event)"
           @mousedown="mousedownItem"
           @mouseenter="pointerSet(idx)"
         >
@@ -189,12 +191,14 @@ export default {
     mousedownItem () {
       common.mousedownItem(this)
     },
-    selectItem (option) {
+    selectItem (option, e) {
       const tempSelectedOptions = this.selectedOptions.concat(option)
       const selectedOptions = tempSelectedOptions.filter((el, idx) => {
         return tempSelectedOptions.indexOf(el) === idx
       })
-      this.closeOptions()
+      if (!e.shiftKey) {
+        this.closeOptions()
+      }
       this.searchText = ''
       this.$emit('select', selectedOptions, option, 'insert')
     },
